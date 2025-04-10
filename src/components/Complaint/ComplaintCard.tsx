@@ -25,29 +25,19 @@ const ComplaintCard = ({ complaint, isAdmin = false }: ComplaintCardProps) => {
     ? `${complaint.description.substring(0, 100)}...` 
     : complaint.description;
 
-  // Get status badge class
-  const getStatusClass = (status: string) => {
+  // Get status badge component
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'complaint-status-pending';
+        return <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">Pending</Badge>;
       case 'in-progress':
-        return 'complaint-status-in-progress';
+        return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">In Progress</Badge>;
       case 'resolved':
-        return 'complaint-status-resolved';
+        return <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">Resolved</Badge>;
       case 'rejected':
-        return 'complaint-status-rejected';
+        return <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">Rejected</Badge>;
       default:
-        return 'complaint-status-pending';
-    }
-  };
-
-  // Format status for display
-  const formatStatus = (status: string) => {
-    switch (status) {
-      case 'in-progress':
-        return 'In Progress';
-      default:
-        return status.charAt(0).toUpperCase() + status.slice(1);
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
@@ -56,9 +46,7 @@ const ComplaintCard = ({ complaint, isAdmin = false }: ComplaintCardProps) => {
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-semibold">{complaint.title}</CardTitle>
-          <span className={getStatusClass(complaint.status)}>
-            {formatStatus(complaint.status)}
-          </span>
+          {getStatusBadge(complaint.status)}
         </div>
         <div className="flex items-center text-sm text-gray-500 mt-1 space-x-4">
           <Badge variant="outline" className="text-xs">

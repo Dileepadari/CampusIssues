@@ -19,12 +19,11 @@ const Admin = () => {
     if (authStatus === 'true' && userRole === 'admin') {
       setIsAuthenticated(true);
       setIsAdmin(true);
+      setLoading(false);
     } else {
       // Redirect to login if not authenticated or not admin
       navigate('/login');
     }
-    
-    setLoading(false);
   }, [navigate]);
 
   if (loading) {

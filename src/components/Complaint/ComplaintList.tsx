@@ -15,8 +15,8 @@ interface ComplaintListProps {
 
 const ComplaintList = ({ complaints, isAdmin = false }: ComplaintListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<ComplaintCategory | ''>('');
-  const [statusFilter, setStatusFilter] = useState<ComplaintStatus | ''>('');
+  const [categoryFilter, setCategoryFilter] = useState<ComplaintCategory | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<ComplaintStatus | 'all'>('all');
 
   // Filter complaints based on search and filters
   const filteredComplaints = complaints.filter((complaint) => {
@@ -27,10 +27,10 @@ const ComplaintList = ({ complaints, isAdmin = false }: ComplaintListProps) => {
       complaint.trackingId.toLowerCase().includes(searchQuery.toLowerCase());
 
     // Category filter
-    const matchesCategory = categoryFilter === '' || complaint.category === categoryFilter;
+    const matchesCategory = categoryFilter === 'all' || complaint.category === categoryFilter;
 
     // Status filter
-    const matchesStatus = statusFilter === '' || complaint.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || complaint.status === statusFilter;
 
     return matchesSearch && matchesCategory && matchesStatus;
   });
@@ -59,13 +59,13 @@ const ComplaintList = ({ complaints, isAdmin = false }: ComplaintListProps) => {
             <Label htmlFor="category-filter" className="text-xs mb-1 block">Category</Label>
             <Select
               value={categoryFilter}
-              onValueChange={(value) => setCategoryFilter(value as ComplaintCategory | '')}
+              onValueChange={(value) => setCategoryFilter(value as ComplaintCategory | 'all')}
             >
               <SelectTrigger id="category-filter" className="w-full sm:w-[180px]">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -79,13 +79,13 @@ const ComplaintList = ({ complaints, isAdmin = false }: ComplaintListProps) => {
             <Label htmlFor="status-filter" className="text-xs mb-1 block">Status</Label>
             <Select
               value={statusFilter}
-              onValueChange={(value) => setStatusFilter(value as ComplaintStatus | '')}
+              onValueChange={(value) => setStatusFilter(value as ComplaintStatus | 'all')}
             >
               <SelectTrigger id="status-filter" className="w-full sm:w-[180px]">
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 {statuses.map((status) => (
                   <SelectItem key={status} value={status}>
                     {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -114,7 +114,7 @@ const ComplaintList = ({ complaints, isAdmin = false }: ComplaintListProps) => {
         <div className="text-center py-12 border rounded-lg bg-muted/30">
           <p className="text-lg font-medium">No complaints found</p>
           <p className="text-muted-foreground mt-1">
-            {searchQuery || categoryFilter || statusFilter 
+            {searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
               ? 'Try adjusting your filters or search query'
               : 'No complaints have been submitted yet'}
           </p>

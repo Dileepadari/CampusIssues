@@ -20,12 +20,11 @@ const Dashboard = () => {
     if (authStatus === 'true') {
       setIsAuthenticated(true);
       setIsAdmin(userRole === 'admin');
+      setLoading(false);
     } else {
       // Redirect to login if not authenticated
       navigate('/login');
     }
-    
-    setLoading(false);
   }, [navigate]);
 
   if (loading) {
