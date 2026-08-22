@@ -1,68 +1,51 @@
-
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-interface Props {
-  children: ReactNode;
-}
+type Props = { children: ReactNode };
+type State = { error: Error | null };
 
-interface State {
-  hasError: boolean;
-  error: Error | null;
-}
+/**
+ * Last line of defence. A render error anywhere below this shows a recoverable
+ * screen instead of a blank page, and the reload button clears the bad state.
+ */
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { error: null };
 
-class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: null
-  };
-
-  public static getDerivedStateFromError(error: Error): State {
-    // Update state so the next render will show the fallback UI
-    return { hasError: true, error };
+  static getDerivedStateFromError(error: Error): State {
+    return { error };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    console.error('[campusissues] unhandled render error', error, info.componentStack);
   }
 
-  public render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
-          <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md text-center">
-            <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-red-100 mb-4">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
-            <p className="text-gray-600 mb-6">
-              We're sorry, but we encountered an error while trying to display this page.
-            </p>
-            <div className="space-y-2">
-              <Button
-                onClick={() => window.location.reload()}
-                className="w-full"
-              >
-                Reload Page
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  this.setState({ hasError: false, error: null });
-                  window.location.href = '/';
-                }}
-                className="w-full"
-              >
-                Go to Homepage
-              </Button>
-            </div>
+  render() {
+    const { error } = this.state;
+    if (!error) return this.props.children;
+
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-md rounded-xl border border-border bg-card p-8 text-center">
+          <div className="mx-auto mb-4 flex size-11 items-center justify-center rounded-full bg-destructive/10">
+            <AlertTriangle className="size-5 text-destructive" aria-hidden />
+          </div>
+          <h1 className="text-lg font-semibold">Something broke on this page</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            The error has been logged to the console. Reloading usually clears it.
+          </p>
+          <pre className="mt-4 max-h-32 overflow-auto rounded-md bg-muted p-3 text-left text-xs text-muted-foreground">
+            {error.message}
+          </pre>
+          <div className="mt-6 flex justify-center gap-2">
+            <Button variant="outline" onClick={() => this.setState({ error: null })}>
+              Try again
+            </Button>
+            <Button onClick={() => window.location.assign('/')}>Back to home</Button>
           </div>
         </div>
-      );
-    }
-
-    return this.props.children;
+      </div>
+    );
   }
 }
 

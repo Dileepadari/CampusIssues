@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Any dotfile ending in .env, whatever it is called
+*.env
+!.env.example
+
+# Claude Code session scratch (project settings under .claude/ can still be committed)
+.claude/RESUME.md

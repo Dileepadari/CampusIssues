@@ -1,63 +1,48 @@
-
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import ComplaintForm from '@/components/Complaint/ComplaintForm';
+import { toast } from 'sonner';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { PageHeader } from '@/components/common/PageHeader';
+import { ComplaintForm } from '@/components/complaints/ComplaintForm';
+import { useCreateComplaint } from '@/hooks/useComplaints';
 
-const NewComplaint = () => {
+export default function NewComplaint() {
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Check authentication status from localStorage (mock auth)
-    const authStatus = localStorage.getItem('isAuthenticated');
-    const userRole = localStorage.getItem('userRole');
-    
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-      setIsAdmin(userRole === 'admin');
-    } else {
-      // Redirect to login if not authenticated
-      navigate('/login');
-    }
-    
-    setLoading(false);
-  }, [navigate]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
-        <main className="flex-grow flex items-center justify-center">
-          <div className="animate-pulse text-xl">Loading...</div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  const create = useCreateComplaint();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar isAuthenticated={isAuthenticated} isAdmin={isAdmin} />
-      
-      <main className="flex-grow py-8">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold mb-6">Submit a Complaint or Feedback</h1>
-          <p className="text-gray-600 mb-8">
-            Please provide the details of your complaint, feedback, or suggestion. 
-            Be as specific as possible to help us address your concern effectively.
-          </p>
-          
-          <ComplaintForm />
-        </div>
-      </main>
-      
-      <Footer />
+    <div className="mx-auto max-w-3xl space-y-6">
+      <Button variant="ghost" size="sm" className="-ml-2" onClick={() => navigate(-1)}>
+        <ArrowLeft className="size-4" />
+        Back
+      </Button>
+
+      <PageHeader
+        title="Raise a complaint"
+        description="Give staff enough detail to act without having to come back and ask."
+      />
+
+      <Card>
+        <CardContent>
+          <ComplaintForm
+            submitLabel="Submit complaint"
+            isSubmitting={create.isPending}
+            onCancel={() => navigate('/complaints')}
+            onSubmit={(input) =>
+              create.mutate(input, {
+                onSuccess: (complaint) => {
+                  toast.success('Complaint submitted', {
+                    description: `Tracking ID ${complaint.trackingId} - keep it to check progress without signing in.`,
+                    duration: 8000,
+                  });
+                  navigate(`/complaints/${complaint.id}`, { replace: true });
+                },
+              })
+            }
+          />
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default NewComplaint;
+}
