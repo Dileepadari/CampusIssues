@@ -34,6 +34,16 @@ A personal working log. Not documentation, and nothing here is needed to use or 
 
 - `campusissues.theme` in localStorage, read before paint so there is no flash of the wrong theme.
 
+### The lock file was out of sync
+
+`npm ci` failed on a clean checkout with `lock file's ajv@6.15.0 does not satisfy
+ajv@8.20.0`. The lock had drifted from `package.json`, so CI could not install and neither
+could anyone cloning fresh. Local work never noticed because `node_modules` was already
+present and nothing ran `npm ci`.
+
+Regenerated with `npm install`, and `npm ci` verified from scratch afterwards. CI running
+`npm ci` is what makes this stay fixed.
+
 ## Open threads
 
 - **No tests.** The biggest gap. `api.ts` is 1,187 lines of workflow and authorization rules that are pure functions over a plain object, which is close to ideal for testing, and none of it is covered. The SLA arithmetic and the status transition rules are where a silent wrong answer would hurt most.
