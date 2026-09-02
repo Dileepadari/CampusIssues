@@ -15,9 +15,15 @@ Architecture, data model, authorization rules and setup. For what the app does a
 - [Auth and sessions](#auth-and-sessions)
 - [Persistence](#persistence)
 - [Theming and design tokens](#theming-and-design-tokens)
+- [Seed and demo data](#seed-and-demo-data)
 - [Local development](#local-development)
+- [Continuous integration](#continuous-integration)
+- [Security notes](#security-notes)
+- [Documentation](#documentation)
 - [Moving to a real backend](#moving-to-a-real-backend)
 - [Gotchas](#gotchas)
+- [Contributors](#contributors)
+- [Glossary](#glossary)
 
 ## Stack
 
@@ -36,25 +42,22 @@ Node 20.19 or newer is required (Vite 8).
 
 ## Architecture
 
-```
-┌────────────────────────────────────────────┐
-│ Pages (src/pages)                          │  route components, no data access
-└───────────────┬────────────────────────────┘
-                │ hooks
-┌───────────────▼────────────────────────────┐
-│ src/hooks/useComplaints.ts                 │  TanStack Query wrappers,
-│                                            │  cache invalidation, toasts
-└───────────────┬────────────────────────────┘
-                │ every read and write
-┌───────────────▼────────────────────────────┐
-│ src/lib/api.ts                             │  THE trust boundary:
-│                                            │  validation, authorization,
-│                                            │  workflow rules, activity log
-└───────────────┬────────────────────────────┘
-                │
-┌───────────────▼────────────────────────────┐
-│ src/lib/db.ts  →  IndexedDB                │  one JSON document
-└────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+  PAGES["Pages<br/>src/pages"]
+  HOOKS["src/hooks/useComplaints.ts<br/>TanStack Query, cache invalidation, toasts"]
+  API["src/lib/api.ts<br/>the trust boundary"]
+  VAL["src/lib/types.ts<br/>Zod schemas"]
+  CRYPTO["src/lib/crypto.ts<br/>PBKDF2, ids, tracking codes"]
+  DB["src/lib/db.ts"]
+  IDB[("IndexedDB<br/>one JSON document")]
+  SEED["src/lib/seed.ts<br/>first-run demo data"]
+
+  PAGES --> HOOKS --> API
+  API --> VAL
+  API --> CRYPTO
+  API --> DB --> IDB
+  DB --> SEED
 ```
 
 The important line is `api.ts`. Components never touch the database, never compute a permission and never decide whether a status change is legal. Every one of those decisions lives in one file, expressed the way a server would express it, so the port to a real backend is a rewrite of that file's internals rather than a hunt through the UI.
@@ -239,6 +242,82 @@ There are no environment variables. There is no backend to run.
 
 Deploying is a static build: `npm run build` and serve `dist/`. The app uses history routing, so the host must rewrite unknown paths to `index.html`.
 
+## Seed and demo data
+
+The database seeds itself the first time the app runs, so a fresh clone opens on a system
+that already looks used rather than an empty shell. There is no setup step and no server.
+
+| Entity | What the seed creates |
+|---|---|
+| Users | An admin, several staff across departments, and students |
+| Complaints | A spread across every category, priority and status, with realistic ages so SLA figures and the trend chart have shape |
+| Comments and activity | Threads and a full activity timeline per complaint |
+| Notifications | Unread items, so the bell has a count |
+
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@campus.edu` | `Admin@1234` |
+| Staff | `maintenance@campus.edu` | `Staff@1234` |
+| Student | `student@campus.edu` | `Student@1234` |
+
+The addresses are institutional-looking rather than `example.com` because the app is a
+campus complaints system and the domain is part of what makes the demo legible. Nothing
+here is a real inbox, no mail is ever sent, and the data never leaves the browser.
+
+**Reset:** Settings has a reset action that wipes IndexedDB and re-seeds. Clearing site
+data does the same thing.
+
+## Continuous integration
+
+`.github/workflows/ci.yml`, on push and PR to `main`/`master`.
+
+| Job | Runs |
+|---|---|
+| **build** | `npm ci`, `npm run lint`, `tsc -b --noEmit`, `npm run build` |
+| **audit** | `npm audit --omit=dev`, advisory only, but fails on any **critical** advisory |
+
+There is no test suite to run. That is the largest gap in this repo and is recorded under
+[Gotchas](#gotchas); the typecheck and build are what stand in for it today.
+
+## Security notes
+
+### The honest threat model
+
+Everything runs in the browser. There is no server, so there is no place to put a check a
+determined visitor cannot reach. `api.ts` enforces authorization the way a server would,
+which is worth doing, but anyone with devtools can edit IndexedDB directly.
+
+| Concern | How it is handled | What it is actually worth |
+|---|---|---|
+| Password storage | PBKDF2-SHA256, 120,000 iterations, per-user random salt | Protects stored passwords from casual inspection. Not from someone with device access |
+| Password comparison | `constantTimeEqual`, length-independent | Hygiene. There is no remote attacker to time |
+| Authorization | `requireUser`, `requireStaff`, `requireAdmin` on every mutation, plus per-record ownership checks | Correct, and the reason the port to a real backend is confined to one file |
+| Input validation | Zod schemas parsed at the API boundary | Correct, and reused unchanged on a server |
+| Session | Random 24-byte token, 7 day TTL | A token nobody can steal remotely, because it never leaves the machine |
+| XSS | No `dangerouslySetInnerHTML` anywhere; all content renders as text | Genuinely protective |
+
+**Do not put anything confidential in this app as it stands.** That is not a bug to fix;
+it is what a browser-only application is. The design decision that matters is that every
+rule lives in `api.ts` expressed server-side, so making it real is a change of storage
+rather than a rewrite of the rules.
+
+### Dependencies
+
+`npm audit --omit=dev` reports zero advisories at any severity.
+
+## Documentation
+
+`README.md` and `README-light.md` are the same page in two themes. GitHub has no theme
+toggle, so the toggle is a pair of files linking to each other, each using one screenshot
+set. Only `README.md` is edited by hand:
+
+```bash
+npm run docs:readme-light   # regenerates README-light.md from README.md
+```
+
+The script fails loudly if a marker it rewrites has gone missing, so the two cannot
+silently drift.
+
 ## Moving to a real backend
 
 The port is deliberately contained:
@@ -258,3 +337,26 @@ The port is deliberately contained:
 - **Radix Select swallows the click right after it closes.** Selecting a category and immediately clicking the next field can drop that click. It is upstream behaviour and only shows up under automation, but it is worth knowing when writing UI tests.
 - **The seed is time-relative.** Snapshot tests against seeded data will drift. Assert on shape and ordering, not on dates.
 - **`noUnusedLocals` and `noUnusedParameters` are on**, along with `erasableSyntaxOnly`. No parameter properties and no enums; the codebase uses `as const` arrays with derived union types instead, which is also what gives the label maps their exhaustiveness.
+
+## Contributors
+
+| Person | Owns |
+|---|---|
+| [Dileep Adari](https://github.com/Dileepadari) | Everything: the API layer, the workflow rules, the UI and the seed |
+
+## Glossary
+
+| Term | Meaning |
+|---|---|
+| **Complaint** | One reported issue, with a category, priority, status and assignee |
+| **Tracking id** | The public code (`CI-7KDQ-2M4X`) that lets someone follow a complaint without an account |
+| **SLA** | The hours a complaint of a given priority is allowed before it is late |
+| **Activity** | An append-only entry recording every status change, assignment and comment |
+| **Reopen window** | 14 days after resolution, during which the author may reopen |
+| **Staff** | A user who can be assigned complaints in their department |
+| **Admin** | A user who can do anything staff can, plus manage people and see every department |
+
+---
+
+Minor and local implementation notes that do not belong in this document are kept in
+[not_for_you.md](./not_for_you.md).
