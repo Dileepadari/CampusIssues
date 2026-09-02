@@ -1,3 +1,5 @@
+<!-- Generated from README.md by scripts/build-light-readme.mjs. Do not edit by hand. -->
+
 <div align="center">
 
 <picture>
@@ -23,7 +25,7 @@
 
 **[Developer documentation](./DEVDOC.md)** · [Features](#features) · [Getting started](#getting-started)
 
-<p><b>Dark mode</b> · <a href="./README-light.md">View this page in light mode</a></p>
+<p><b>Light mode</b> · <a href="./README.md">View this page in dark mode</a></p>
 
 </div>
 
@@ -63,44 +65,44 @@ Two details drove the design, and both come from watching complaint systems fail
 
 ## Screenshots
 
-Every image is a real 1440x900 viewport render against the seeded demo data. This page shows **dark mode**; the same gallery in light mode is at **[README-light.md](./README-light.md)**.
+Every image is a real 1440x900 viewport render against the seeded demo data. This page shows **light mode**; the same gallery in dark mode is at **[README.md](./README.md)**.
 
 <table>
   <tr>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/01-dashboard.png" alt="Staff dashboard with open, overdue and unassigned counts and a 30 day trend" loading="lazy">
+      <img src="./docs/screenshots/light/01-dashboard.png" alt="Staff dashboard with open, overdue and unassigned counts and a 30 day trend" loading="lazy">
       <p align="center"><b>Dashboard</b><br><sub>Open, overdue, unassigned, and whether the queue is clearing.</sub></p>
     </td>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/02-complaints.png" alt="The complaint queue with status, priority and overdue badges" loading="lazy">
+      <img src="./docs/screenshots/light/02-complaints.png" alt="The complaint queue with status, priority and overdue badges" loading="lazy">
       <p align="center"><b>The queue</b><br><sub>Search, filter and sort, with overdue flagged in place.</sub></p>
     </td>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/05-complaint-detail.png" alt="A complaint with its conversation, internal note and triage panel" loading="lazy">
+      <img src="./docs/screenshots/light/05-complaint-detail.png" alt="A complaint with its conversation, internal note and triage panel" loading="lazy">
       <p align="center"><b>Complaint</b><br><sub>Conversation, internal notes, and the triage panel beside it.</sub></p>
     </td>
   </tr>
   <tr>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/06-new-complaint.png" alt="The complaint form with category, priority, attachments and privacy switches" loading="lazy">
+      <img src="./docs/screenshots/light/06-new-complaint.png" alt="The complaint form with category, priority, attachments and privacy switches" loading="lazy">
       <p align="center"><b>Raise one</b><br><sub>Category drives routing, priority drives the deadline.</sub></p>
     </td>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/03-board.png" alt="The community board of publicly shared complaints" loading="lazy">
+      <img src="./docs/screenshots/light/03-board.png" alt="The community board of publicly shared complaints" loading="lazy">
       <p align="center"><b>Community board</b><br><sub>Upvote an existing issue instead of filing a duplicate.</sub></p>
     </td>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/04-analytics.png" alt="Analytics with resolution time, SLA attainment and breakdowns" loading="lazy">
+      <img src="./docs/screenshots/light/04-analytics.png" alt="Analytics with resolution time, SLA attainment and breakdowns" loading="lazy">
       <p align="center"><b>Analytics</b><br><sub>Resolution time, target attainment and where volume comes from.</sub></p>
     </td>
   </tr>
   <tr>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/07-people.png" alt="The people screen with roles and account status" loading="lazy">
+      <img src="./docs/screenshots/light/07-people.png" alt="The people screen with roles and account status" loading="lazy">
       <p align="center"><b>People</b><br><sub>Grant staff access and deactivate accounts.</sub></p>
     </td>
     <td width="33%" valign="top">
-      <img src="./docs/screenshots/dark/08-landing.png" alt="The public landing page with the tracking lookup" loading="lazy">
+      <img src="./docs/screenshots/light/08-landing.png" alt="The public landing page with the tracking lookup" loading="lazy">
       <p align="center"><b>Public landing</b><br><sub>Track any complaint by code, with no account.</sub></p>
     </td>
     <td width="33%" valign="top">
@@ -115,15 +117,15 @@ Each image is its own device viewport. The sidebar collapses to a menu and the s
 <table>
   <tr>
     <td width="22%" valign="top">
-      <img src="./docs/screenshots/responsive/dark/mobile-dashboard.png" alt="Dashboard at 390px wide" loading="lazy">
+      <img src="./docs/screenshots/responsive/light/mobile-dashboard.png" alt="Dashboard at 390px wide" loading="lazy">
       <p align="center"><sub><b>Dashboard</b><br>390 x 844</sub></p>
     </td>
     <td width="22%" valign="top">
-      <img src="./docs/screenshots/responsive/dark/mobile-complaints.png" alt="The queue at 390px wide" loading="lazy">
+      <img src="./docs/screenshots/responsive/light/mobile-complaints.png" alt="The queue at 390px wide" loading="lazy">
       <p align="center"><sub><b>Queue</b><br>390 x 844</sub></p>
     </td>
     <td width="46%" valign="top">
-      <img src="./docs/screenshots/responsive/dark/tablet-dashboard.png" alt="Dashboard at 820px wide" loading="lazy">
+      <img src="./docs/screenshots/responsive/light/tablet-dashboard.png" alt="Dashboard at 820px wide" loading="lazy">
       <p align="center"><sub><b>Dashboard</b><br>820 x 900</sub></p>
     </td>
   </tr>
